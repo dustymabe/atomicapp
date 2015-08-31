@@ -18,10 +18,13 @@ RUN echo -e "[epel]\nname=epel\nenabled=1\nbaseurl=https://dl.fedoraproject.org/
 
 # lets install pip, and gcc for the native extensions
 # and remove all after use
-RUN yum install -y --setopt=tsflags=nodocs python-pip python-setuptools docker gcc && \
+RUN yum install -y --setopt=tsflags=nodocs python-pip python-setuptools gcc && \
     python setup.py install && \
     yum remove -y gcc cpp glibc-devel glibc-headers kernel-headers libmpc mpfr python-pip && \
     yum clean all
+
+RUN ln -s /host/usr/bin/docker /usr/bin/docker
+ENV LD_LIBRARY_PATH "/lib64/:/lib/:/host/lib64/:/host/lib/"
 
 WORKDIR /atomicapp
 VOLUME /atomicapp
