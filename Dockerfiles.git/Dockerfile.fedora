@@ -9,8 +9,6 @@ LABEL io.projectatomic.nulecule.atomicappversion="0.2.2" \
       STOP="docker run -it --rm \${OPT1} --privileged -v `pwd`:/atomicapp -v /run:/run -v /:/host --net=host --name \${NAME} -e NAME=\${NAME} -e IMAGE=\${IMAGE} \${IMAGE} -v \${OPT2} stop \${OPT3}" \
       INSTALL="docker run -it --rm \${OPT1} --privileged -v `pwd`:/atomicapp -v /run:/run -v /:/host --name \${NAME} -e NAME=\${NAME} -e IMAGE=\${IMAGE} \${IMAGE} -v \${OPT2} install \${OPT3} \${IMAGE}"
 
-WORKDIR /opt/atomicapp
-
 # Add the requirements file into the container
 ADD requirements.txt /opt/atomicapp/
 
