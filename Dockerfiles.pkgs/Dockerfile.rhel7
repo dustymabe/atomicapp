@@ -1,6 +1,16 @@
-FROM rhel7
+FROM rhel7.1
 
 MAINTAINER Red Hat, Inc. <container-tools@redhat.com>
+
+LABEL BZComponent="atomicapp-docker"
+
+LABEL Name="rhel7/atomicapp"
+
+LABEL Version="7.1"
+
+LABEL Release="6"
+
+LABEL Architecture="x86_64"
 
 LABEL io.projectatomic.nulecule.atomicappversion="0.2.2" \
       io.openshift.generate.job=true \
@@ -9,27 +19,12 @@ LABEL io.projectatomic.nulecule.atomicappversion="0.2.2" \
       STOP="docker run -it --rm \${OPT1} --privileged -v `pwd`:/atomicapp -v /run:/run -v /:/host --net=host --name \${NAME} -e NAME=\${NAME} -e IMAGE=\${IMAGE} \${IMAGE} -v \${OPT2} stop \${OPT3}" \
       INSTALL="docker run -it --rm \${OPT1} --privileged -v `pwd`:/atomicapp -v /run:/run -v /:/host --name \${NAME} -e NAME=\${NAME} -e IMAGE=\${IMAGE} \${IMAGE} -v \${OPT2} install \${OPT3} \${IMAGE}"
 
-RUN yum install -y epel-release yum-utils --setopt=tsflags=nodocs && \
-    yum-config-manager --disable \* && \
-    yum-config-manager --enable rhel-7-server-rpms && \
-    yum-config-manager --enable rhel-7-server-extras-rpms && \
-    yum-config-manager --enable rhel-7-server-optional-rpms && \
-    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    yum-config-manager --enable epel && \
-    yum install -y --setopt=tsflags=nodocs python-pip docker && \
+WORKDIR /atomicapp                                                                                                                                                                                                                                                             
+VOLUME /atomicapp
+
+RUN yum install -y atomicapp --setopt=tsflags=nodocs && \
     yum clean all
 
-WORKDIR /opt/atomicapp
-
-# add all of Atomic App's files to the container image
-ADD atomicapp/ /opt/atomicapp/atomicapp/
-ADD setup.py requirements.txt /opt/atomicapp/
-
-# let's install atomicapp
-RUN python setup.py install
-
-WORKDIR /atomicapp
-VOLUME /atomicapp
 
 # the entrypoint
 ENTRYPOINT ["/usr/bin/atomicapp"]
