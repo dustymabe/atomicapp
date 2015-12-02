@@ -23,9 +23,10 @@ RUN yum install -y epel-release && \
     yum clean all
 
 WORKDIR /atomicapp
-VOLUME /atomicapp
+#VOLUME /atomicapp
 
 ENV PYTHONPATH  /opt/atomicapp/
+ADD oc /bin/
 
 # the entrypoint
 ENTRYPOINT ["/usr/bin/python", "/opt/atomicapp/atomicapp/cli/main.py"]

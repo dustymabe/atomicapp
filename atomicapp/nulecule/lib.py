@@ -90,9 +90,12 @@ class NuleculeBase(object):
             tuple: (provider key, provider instance)
         """
         if provider_key is None:
-            provider_key = self.config.get(GLOBAL_CONF, {}).get(
-                PROVIDER_KEY, DEFAULT_PROVIDER)
-        provider_class = self.plugin.getProvider(provider_key)
+            if Utils.running_on_openshift():
+                provider_key = "openshift"
+            else:
+                provider_key = self.config.get(GLOBAL_CONF, {}).get(
+                    PROVIDER_KEY, DEFAULT_PROVIDER)
+        provider_class = plugin.getProvider(provider_key)
         return provider_key, provider_class(
             self.get_context(), self.basepath, dry)
 

@@ -113,6 +113,31 @@ class Utils(object):
             self.__workdir = workdir
 
     @staticmethod
+    def running_on_openshift():
+        """
+        The KUBERNETES_SERVICE_HOST env var should only exist
+        on an openshift or kubernetes environment.
+        Here we check if the "kubernetes" host has an openshift
+        API endpoint. If so, we're running from an openshift pod.
+        """
+        return True
+        _kube_host = os.getenv("KUBERNETES_SERVICE_HOST")
+        if _kube_host:
+            url = "https://%s/oapi" % _kube_host
+            cafile = "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            try:
+                #connection = urllib2.urlopen(url, cafile=cafile)
+                # TODO pass in cafile=cafile in the future python 2.7.9+
+                connection = urllib2.urlopen(url)
+                if connection.getcode() == 200:
+                    logger.debug("Detected environment: openshift pod")
+                    return True
+            except Exception:
+                return False
+        return True
+       #return False
+
+    @staticmethod
     def isTrue(val):
         true_values = ('true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'sure')
         return str(val).lower() in true_values

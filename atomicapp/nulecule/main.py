@@ -44,9 +44,9 @@ class NuleculeManager(object):
         self.image = None     # The container image to pull the app from
 
         # Adjust app_spec, destination, and answer file paths if absolute.
-        if os.path.isabs(app_spec):
-            app_spec = os.path.join(Utils.getRoot(),
-                                    app_spec.lstrip('/'))
+#       if os.path.isabs(app_spec):
+#           app_spec = os.path.join(Utils.getRoot(),
+#                                   app_spec.lstrip('/'))
         if destination and os.path.isabs(destination):
             destination = os.path.join(Utils.getRoot(),
                                        destination.lstrip('/'))

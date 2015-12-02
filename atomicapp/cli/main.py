@@ -33,6 +33,7 @@ from atomicapp.constants import (__ATOMICAPPVERSION__,
                                  ANSWERS_FILE_SAMPLE_FORMAT,
                                  HOST_DIR,
                                  LOCK_FILE,
+                                 APP_ENT_PATH,
                                  PROVIDERS)
 from atomicapp.nulecule import NuleculeManager
 from atomicapp.nulecule.exceptions import NuleculeException
@@ -243,8 +244,14 @@ class CLI():
         parser_stop.set_defaults(func=cli_stop)
 
     def run(self):
+
         self.set_arguments()
-        args = self.parser.parse_args()
+        #if Utils.running_on_openshift():
+        if True:
+            args = self.parser.parse_args('--verbose run /{}'.format(APP_ENT_PATH).split())
+        else:
+            args = self.parser.parse_args()
+
         if args.verbose:
             set_logging(level=logging.DEBUG)
         elif args.quiet:
@@ -252,9 +259,9 @@ class CLI():
         else:
             set_logging(level=logging.INFO)
 
-        lock = LockFile(os.path.join(Utils.getRoot(), LOCK_FILE))
+       #lock = LockFile(os.path.join(Utils.getRoot(), LOCK_FILE))
         try:
-            lock.acquire(timeout=-1)
+       #    lock.acquire(timeout=-1)
             args.func(args)
         except AttributeError:
             if hasattr(args, 'func'):
@@ -272,9 +279,9 @@ class CLI():
                 logger.error("Exception caught: %s", repr(ex))
                 logger.error(
                     "Run the command again with -v option to get more information.")
-        finally:
-            if lock.i_am_locking():
-                lock.release()
+      ##finally:
+      ##    if lock.i_am_locking():
+      ##        lock.release()
 
 
 def main():
