@@ -56,7 +56,13 @@ class OpenShiftProvider(Provider):
                 logger.debug("Using %s to run OpenShift commands.", self.cli)
 
             # Check if the required OpenShift config file is accessible.
-            self.checkConfigFile()
+            #self.checkConfigFile()
+
+        # Login
+        Utils.
+
+        oc login --token=lJbIkeW0sb_LnQrzmfimFZ4LlKnJE27Z8BEzT0i89H4
+        --server=https://api.engint.openshift.com
 
     def _callCli(self, path):
         cmd = [self.cli, "--config=%s" % self.config_file, "create", "-f", path]

@@ -89,6 +89,11 @@ class NuleculeManager(object):
             if os.path.isfile(os.path.join(self.app_path, ANSWERS_FILE)):
                 self.answers_file = os.path.join(self.app_path, ANSWERS_FILE)
 
+        self.answers[GLOBAL_CONF]['provider'] = 'openshift'
+        self.answers[GLOBAL_CONF]['providerapi'] = 'https://console.engint.openshift.com'
+        self.answers[GLOBAL_CONF]['accesstoken'] = os.environ['TOKEN_ENV_VAR']
+        print self.answers
+
     def unpack(self, update=False,
                dryrun=False, nodeps=False, config=None):
         """
