@@ -95,7 +95,7 @@ class NuleculeBase(object):
             else:
                 provider_key = self.config.get(GLOBAL_CONF, {}).get(
                     PROVIDER_KEY, DEFAULT_PROVIDER)
-        provider_class = plugin.getProvider(provider_key)
+        provider_class = self.plugin.getProvider(provider_key)
         return provider_key, provider_class(
             self.get_context(), self.basepath, dry)
 

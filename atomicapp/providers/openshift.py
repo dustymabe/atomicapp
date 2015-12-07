@@ -59,14 +59,19 @@ class OpenShiftProvider(Provider):
             #self.checkConfigFile()
 
         # Login
-        Utils.
+        cmd  = 'oc login '
+        cmd += '--token=%s ' % self.config.get('accesstoken')
+        cmd += '--server=%s ' % self.config.get('providerapi')
+        cmd += '--insecure-skip-tls-verify'
+        logger.info("Calling: %s", cmd)
+        Utils.run_cmd(cmd.split(), checkexitcode=True)
 
-        oc login --token=lJbIkeW0sb_LnQrzmfimFZ4LlKnJE27Z8BEzT0i89H4
-        --server=https://api.engint.openshift.com
 
     def _callCli(self, path):
-        cmd = [self.cli, "--config=%s" % self.config_file, "create", "-f", path]
+        #cmd = [self.cli, "--config=%s" % self.config_file, "create", "-f", path]
+        cmd = [self.cli, "create", "-f", path]
 
+        logger.info("Calling: %s", " ".join(cmd))
         if self.dryrun:
             logger.info("Calling: %s", " ".join(cmd))
         else:
