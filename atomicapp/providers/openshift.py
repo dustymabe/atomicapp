@@ -56,22 +56,11 @@ class OpenShiftProvider(Provider):
                 logger.debug("Using %s to run OpenShift commands.", self.cli)
 
             # Check if the required OpenShift config file is accessible.
-            #self.checkConfigFile()
-
-        # Login
-        cmd  = 'oc login '
-        cmd += '--token=%s ' % self.config.get('accesstoken')
-        cmd += '--server=%s ' % self.config.get('providerapi')
-        cmd += '--insecure-skip-tls-verify'
-        logger.info("Calling: %s", cmd)
-        Utils.run_cmd(cmd.split(), checkexitcode=True)
-
+            self.checkConfigFile()
 
     def _callCli(self, path):
-        #cmd = [self.cli, "--config=%s" % self.config_file, "create", "-f", path]
-        cmd = [self.cli, "create", "-f", path]
+        cmd = [self.cli, "--config=%s" % self.config_file, "create", "-f", path]
 
-        logger.info("Calling: %s", " ".join(cmd))
         if self.dryrun:
             logger.info("Calling: %s", " ".join(cmd))
         else:
