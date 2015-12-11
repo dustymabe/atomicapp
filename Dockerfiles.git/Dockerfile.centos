@@ -19,6 +19,7 @@ ADD requirements.txt ./
 # Install needed requirements
 RUN yum install -y epel-release && \
     yum install -y --setopt=tsflags=nodocs docker && \
+    yum install -y http://mirror.centos.org/centos/7/cr/x86_64/Packages/python-jsonpointer-1.9-2.el7.noarch.rpm  && \
     yum install -y --setopt=tsflags=nodocs $(sed s/^/python-/ requirements.txt) && \
     yum clean all
 
@@ -26,7 +27,7 @@ WORKDIR /atomicapp
 #VOLUME /atomicapp
 
 ENV PYTHONPATH  /opt/atomicapp/
-ADD oc /bin/
+#ADD oc /bin/
 
 # the entrypoint
 ENTRYPOINT ["/usr/bin/python", "/opt/atomicapp/atomicapp/cli/main.py"]
