@@ -1,0 +1,6 @@
+*
+!atomicapp/*
+!requirements.txt
+!test-requirements.txt
+!tests/*
+!oc
