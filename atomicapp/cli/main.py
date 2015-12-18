@@ -48,6 +48,20 @@ def print_app_location(app_path):
     print("\nYour application resides in %s" % app_path)
     print("Please use this directory for managing your application\n")
 
+def cli_genanswers(args):
+    try:
+        argdict = args.__dict__
+        nm = NuleculeManager(app_spec=argdict['app_spec'],
+                             destination='none')
+        nm.genanswers(**argdict)
+        Utils.rm_dir(nm.app_path) #clean up files
+        sys.exit(0)
+    except NuleculeException as e:
+        logger.error(e)
+        sys.exit(1)
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        sys.exit(1)
 
 def cli_install(args):
     try:
@@ -280,6 +294,16 @@ class CLI():
                 "Path to the directory where the Atomic App is installed or "
                 "an image containing an Atomic App which should be stopped."))
         stop_subparser.set_defaults(func=cli_stop)
+
+        # === "genanswers" SUBPARSER ===
+        stop_subparser = toplevel_subparsers.add_parser(
+            "genanswers", parents=[globals_parser])
+        stop_subparser.add_argument(
+            "app_spec",
+            help=(
+                "Path to the directory where the Atomic App is installed or "
+                "an image containing an Atomic App which should be stopped."))
+        stop_subparser.set_defaults(func=cli_genanswers)
 
         # Some final fixups.. We want the "help" from the global
         # parser to be output when someone runs 'atomicapp --help'
