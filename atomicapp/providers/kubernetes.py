@@ -22,10 +22,13 @@ import logging
 import os
 from string import Template
 
+from atomicapp.constants import (LOGGER_COCKPIT,
+                                 LOGGER_DEFAULT)
 from atomicapp.plugin import Provider, ProviderFailedException
-from atomicapp.utils import printErrorStatus, Utils
+from atomicapp.utils import Utils
 
-logger = logging.getLogger(__name__)
+cockpitlogger = logging.getLogger(LOGGER_COCKPIT)
+logger = logging.getLogger(LOGGER_DEFAULT)
 
 
 class KubernetesProvider(Provider):
@@ -107,7 +110,11 @@ class KubernetesProvider(Provider):
         if self.dryrun:
             logger.info("DRY-RUN: %s", " ".join(cmd))
         else:
-            ec, stdout, stderr = Utils.run_cmd(cmd, checkexitcode=True)
+            try:
+                ec, stdout, stderr = Utils.run_cmd(cmd, checkexitcode=True)
+            except Exception as e:
+                cockpitlogger.error("cmd failed: %s" % e)
+                raise
             return stdout
 
     def process_k8s_artifacts(self):
@@ -123,7 +130,7 @@ class KubernetesProvider(Provider):
                 except Exception:
                     msg = "Error processing %s artifcats, Error:" % os.path.join(
                         self.path, artifact)
-                    printErrorStatus(msg)
+                    cockpitlogger.error(msg)
                     raise
             if "kind" in data:
                 self.k8s_manifests.append((data["kind"].lower(), artifact))

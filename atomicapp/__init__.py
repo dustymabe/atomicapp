@@ -38,4 +38,4 @@ def set_logging(name="atomicapp", level=logging.DEBUG):
     # add ch to logger
     logger.addHandler(ch)
 
-set_logging(level=logging.DEBUG)  # override this however you want
+#set_logging(level=logging.DEBUG)  # override this however you want
