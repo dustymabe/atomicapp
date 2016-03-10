@@ -154,7 +154,7 @@ class Logging:
 
             # configure logger for basic no color printing to stdout
             handler = logging.StreamHandler(stream=sys.stdout)
-            formatter = customOutputFormatter(formatstr)
+            formatter = customOutputFormatter(formatstr, "%s")
             handler.setFormatter(formatter)
             logger.addHandler(handler)
             logger.setLevel(logging_level)
@@ -166,7 +166,7 @@ class Logging:
 
             # configure logger for color printing to stdout
             handler = logging.StreamHandler(stream=sys.stdout)
-            formatter = colorizeOutputFormatter(formatstr)
+            formatter = colorizeOutputFormatter(formatstr, "%s")
             handler.setFormatter(formatter)
             logger.addHandler(handler)
             logger.setLevel(logging_level)
