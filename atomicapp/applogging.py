@@ -122,6 +122,9 @@ class Logging:
             formatstr = '%(asctime)s - [%(levelname)s] - %(longerfilename)s - %(message)s'
         else:
             formatstr = '[%(levelname)s] - %(filename)s - %(message)s'
+        # Set a tuple of options that will be passed to the formatter. The %s 
+        # will tell the logging library to use seconds since epoch for time stamps
+        formattup = (formatstr, "%s")
 
         # Get the loggers and clear out the handlers (allows this function
         # to be ran more than once)
@@ -154,7 +157,7 @@ class Logging:
 
             # configure logger for basic no color printing to stdout
             handler = logging.StreamHandler(stream=sys.stdout)
-            formatter = customOutputFormatter(formatstr, "%s")
+            formatter = customOutputFormatter(*formattup)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
             logger.setLevel(logging_level)
@@ -166,7 +169,7 @@ class Logging:
 
             # configure logger for color printing to stdout
             handler = logging.StreamHandler(stream=sys.stdout)
-            formatter = colorizeOutputFormatter(formatstr, "%s")
+            formatter = colorizeOutputFormatter(*formattup)
             handler.setFormatter(formatter)
             logger.addHandler(handler)
             logger.setLevel(logging_level)
