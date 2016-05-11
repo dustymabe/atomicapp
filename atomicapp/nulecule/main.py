@@ -36,7 +36,6 @@ from atomicapp.constants import (GLOBAL_CONF,
                                  LOGGER_COCKPIT,
                                  LOGGER_DEFAULT,
                                  MAIN_FILE,
-                                 PROVIDER_KEY,
                                  __ATOMICAPPVERSION__,
                                  __NULECULESPECVERSION__)
 from atomicapp.nulecule.base import Nulecule
@@ -437,11 +436,4 @@ class NuleculeManager(object):
         Returns:
             dict
         """
-        _config = copy.deepcopy(config)
-        _config[GLOBAL_CONF] = config.get(GLOBAL_CONF) or {}
-
-        # If a provider is provided via CLI, override the config parameter
-        if cli_provider:
-            _config[GLOBAL_CONF][PROVIDER_KEY] = cli_provider
-
-        return _config
+        return self.nulecule.config.runtime_answers()

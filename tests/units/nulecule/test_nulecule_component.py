@@ -136,9 +136,12 @@ class TestNuleculeComponentLoadConfig(unittest.TestCase):
             'general': {'a': 'b', 'key2': 'val2'},
             'some-app': {'key1': 'val1'}
         }
+        from atomicapp.nulecule.config import Config
+        config = Config(answers=initial_config)
 
         nc = NuleculeComponent('some-app', 'some/path', params=params)
-        nc.load_config(config=copy.deepcopy(initial_config))
+        nc.load_config(config=config)
+        from ipdb import set_trace; set_trace()
 
         self.assertEqual(nc.config, {
             'general': {'a': 'b', 'key2': 'val2'},
