@@ -117,3 +117,11 @@ class Config(object):
         else:
             parent, current = '', words[0]
         return parent, current
+
+    def __eq__(self, obj):
+        """
+        Check equality of config instances.
+        """
+        if self._namespace == obj._namespace or self._answers == obj._answers or self._data == obj._data or self._cli == obj._cli:
+            return True
+        return False
