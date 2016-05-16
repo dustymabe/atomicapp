@@ -1,7 +1,7 @@
-import copy
 import mock
 import unittest
 from atomicapp.nulecule.base import NuleculeComponent, Nulecule
+from atomicapp.nulecule.config import Config
 from atomicapp.nulecule.exceptions import NuleculeException
 
 
@@ -129,21 +129,20 @@ class TestNuleculeComponentLoadConfig(unittest.TestCase):
     def test_load_config_local_app(self):
         """Test load config for local app"""
         params = [
-            {'name': 'key1'},
-            {'name': 'key2'}
+            {'name': 'key1', 'description': 'key1'},
+            {'name': 'key2', 'description': 'key2'}
         ]
         initial_config = {
             'general': {'a': 'b', 'key2': 'val2'},
             'some-app': {'key1': 'val1'}
         }
-        from atomicapp.nulecule.config import Config
-        config = Config(answers=initial_config)
+        config = Config('some-app', answers=initial_config)
 
-        nc = NuleculeComponent('some-app', 'some/path', params=params)
+        nc = NuleculeComponent('some-app', 'some/path',
+                               params=params)
         nc.load_config(config=config)
-        from ipdb import set_trace; set_trace()
 
-        self.assertEqual(nc.config, {
+        self.assertEqual(nc.config.runtime_answers(), {
             'general': {'a': 'b', 'key2': 'val2'},
             'some-app': {'key1': 'val1', 'key2': 'val2'}
         })
@@ -156,25 +155,24 @@ class TestNuleculeComponentLoadConfig(unittest.TestCase):
             spec=Nulecule('some-id', '0.0.2', {}, [], 'some/path')
         )
         params = [
-            {'name': 'key1'},
-            {'name': 'key2'}
+            {'name': 'key1', 'description': 'key1'},
+            {'name': 'key2', 'description': 'key2'}
         ]
         initial_config = {
             'general': {'a': 'b', 'key2': 'val2'},
             'some-app': {'key1': 'val1'}
         }
+        config = Config('some-app', answers=initial_config)
 
         nc = NuleculeComponent('some-app', 'some/path', params=params)
         nc._app = mock_nulecule
-        nc.load_config(config=copy.deepcopy(initial_config))
+        nc.load_config(config=config)
 
         mock_nulecule.load_config.assert_called_once_with(
-            config={
-                'general': {'a': 'b', 'key2': 'val2'},
+            config=Config('some-app', answers=initial_config, data={
+                'general': {},
                 'some-app': {'key1': 'val1', 'key2': 'val2'}
-            }, ask=False, skip_asking=False)
-        mock_merge_config.assert_called_once_with(
-            nc.config, mock_nulecule.config)
+            }), ask=False, skip_asking=False)
 
 
 class TestNuleculeComponentLoadExternalApplication(unittest.TestCase):
@@ -196,7 +194,8 @@ class TestNuleculeComponentLoadExternalApplication(unittest.TestCase):
         mock_os_path_isdir.assert_called_once_with(
             expected_external_app_path)
         mock_Nulecule.load_from_path.assert_called_once_with(
-            expected_external_app_path, dryrun=dryrun, update=update)
+            expected_external_app_path, dryrun=dryrun, namespace='some-app',
+            update=update)
 
     # Use http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html
     # by calling call_count == 1. In order to avoid the return_value = False of Utils.setFileOnwerGroup
