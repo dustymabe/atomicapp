@@ -43,6 +43,13 @@ class Config(object):
         return self._provider
 
     @property
+    def providerconfig(self):
+        """
+        Get provider config info taking into account answers and cli data.
+        """
+        pass
+
+    @property
     def namespace(self):
         """
         Get normalized namespace for this instance.
