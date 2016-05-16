@@ -58,10 +58,10 @@ class Config(object):
     def get(self, key):
         return (
             self._data[self.namespace].get(key) or
-            self._data[self._parent_ns].get(key) or
+            (self._data[self._parent_ns].get(key) if self._parent_ns else None) or
             self._data[GLOBAL_CONF].get(key) or
             self._answers[self.namespace].get(key) or
-            self._answers[self._parent_ns].get(key) or
+            (self._answers[self._parent_ns].get(key) if self._parent_ns else None) or
             self._answers[GLOBAL_CONF].get(key)
         )
 

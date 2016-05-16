@@ -248,8 +248,6 @@ class Nulecule(NuleculeBase):
             #        but only to variables it needs.
             component.load_config(config=config.clone(component.namespace),
                                   ask=ask, skip_asking=skip_asking)
-        from ipdb import set_trace; set_trace()
-        print 1
 
     def load_components(self, nodeps=False, dryrun=False):
         """
