@@ -36,7 +36,8 @@ from atomicapp.constants import (APP_ENT_PATH,
                                  PARAMS_KEY,
                                  NAME_KEY,
                                  INHERIT_KEY,
-                                 ARTIFACTS_KEY)
+                                 ARTIFACTS_KEY,
+                                 NAMESPACE_SEPARATOR)
 from atomicapp.utils import Utils
 from atomicapp.requirements import Requirements
 from atomicapp.nulecule.lib import NuleculeBase
@@ -295,7 +296,7 @@ class Nulecule(NuleculeBase):
     def _get_component_namespace(self, component_name):
         current_namespace = '' if self.namespace == GLOBAL_CONF else self.namespace
         return (
-            '%s.%s' % (current_namespace, component_name)
+            '%s%s%s' % (current_namespace, NAMESPACE_SEPARATOR, component_name)
             if current_namespace else component_name)
 
 

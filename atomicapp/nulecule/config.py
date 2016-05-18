@@ -3,7 +3,8 @@ import logging
 
 from atomicapp.constants import (GLOBAL_CONF,
                                  LOGGER_COCKPIT,
-                                 DEFAULT_PROVIDER)
+                                 DEFAULT_PROVIDER,
+                                 NAMESPACE_SEPARATOR)
 from collections import defaultdict
 
 cockpit_logger = logging.getLogger(LOGGER_COCKPIT)
@@ -117,7 +118,7 @@ class Config(object):
         """
         if self._is_nulecule:
             return '', namespace
-        words = namespace.rsplit('.', 1)
+        words = namespace.rsplit(NAMESPACE_SEPARATOR, 1)
         parent, current = '', ''
         if len(words) == 2:
             parent, current = words[0], words[1]
