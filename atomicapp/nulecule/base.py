@@ -240,6 +240,8 @@ class Nulecule(NuleculeBase):
         Returns:
             None
         """
+        if config is None:
+            config = self.config
         super(Nulecule, self).load_config(
             config=config, ask=ask, skip_asking=skip_asking)
 
@@ -361,6 +363,8 @@ class NuleculeComponent(NuleculeBase):
         """
         Load config for the Nulecule component.
         """
+        if config is None:
+            config = self.config
         super(NuleculeComponent, self).load_config(
             config, ask=ask, skip_asking=skip_asking)
         if isinstance(self._app, Nulecule):

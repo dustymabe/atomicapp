@@ -243,8 +243,7 @@ class NuleculeManager(object):
         # Call unpack to get the app code
         self.nulecule = self.unpack(update=False, dryrun=dryrun, config=self.answers)
 
-        self.nulecule.load_config(config=self.nulecule.config,
-                                  skip_asking=True)
+        self.nulecule.load_config(skip_asking=True)
         # Get answers and write them out to answers.conf in cwd
         answers = self._get_runtime_answers(
             self.nulecule.config, None)
@@ -273,8 +272,7 @@ class NuleculeManager(object):
         # it does exist it will be just be loaded and returned
         self.nulecule = self.unpack(update, dryrun, config=self.answers)
 
-        self.nulecule.load_config(config=self.nulecule.config,
-                                  skip_asking=True)
+        self.nulecule.load_config(skip_asking=True)
         runtime_answers = self._get_runtime_answers(
             self.nulecule.config, None)
         # write sample answers file
@@ -316,7 +314,7 @@ class NuleculeManager(object):
         if not self.answers_file:
             self._process_answers()
 
-        self.nulecule.load_config(config=self.nulecule.config, ask=ask)
+        self.nulecule.load_config(ask=ask)
         self.nulecule.render(cli_provider, dryrun)
         self.nulecule.run(cli_provider, dryrun)
         runtime_answers = self._get_runtime_answers(
@@ -343,7 +341,7 @@ class NuleculeManager(object):
         dryrun = kwargs.get('dryrun') or False
         self.nulecule = Nulecule.load_from_path(
             self.app_path, config=self.answers, dryrun=dryrun)
-        self.nulecule.load_config(config=self.answers)
+        self.nulecule.load_config()
         self.nulecule.render(cli_provider, dryrun=dryrun)
         self.nulecule.stop(cli_provider, dryrun)
 
