@@ -320,6 +320,8 @@ class NuleculeManager(object):
             self._process_answers()
 
         self.nulecule.load_config(ask=ask)
+        if cli_provider:
+            self.nulecule.config.set('provider', cli_provider)
         self.nulecule.render(cli_provider, dryrun)
         self.nulecule.run(cli_provider, dryrun)
         runtime_answers = self._get_runtime_answers(
@@ -345,10 +347,12 @@ class NuleculeManager(object):
 
         dryrun = kwargs.get('dryrun') or False
         self.nulecule = Nulecule.load_from_path(
-            self.app_path, config=self.answers, dryrun=dryrun)
+            self.app_path, config=self.answers, dryrun=dryrun, cli=self.cli)
         self.nulecule.load_config()
-        self.nulecule.render(cli_provider, dryrun=dryrun)
-        self.nulecule.stop(cli_provider, dryrun)
+        if cli_provider:
+            self.nulecule.config.set('provider', cli_provider)
+        self.nulecule.render(self.nulecule.config.provider, dryrun=dryrun)
+        self.nulecule.stop(self.nulecule.config.provider, dryrun)
 
     def clean(self, force=False):
         # For future use
