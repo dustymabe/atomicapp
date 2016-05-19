@@ -53,7 +53,8 @@ class NuleculeManager(object):
     """
 
     def __init__(self, app_spec, destination=None,
-                 cli_answers=None, answers_file=None):
+                 cli_answers=None, answers_file=None,
+                 cli=None):
         """
         init function for NuleculeManager. Sets a few instance variables.
 
@@ -63,6 +64,7 @@ class NuleculeManager(object):
             destination: where to unpack a nulecule to if it isn't local
             cli_answers: some answer file values provided from cli args
             answers_file: the location of the answers file
+            cli (dict): CLI data
         """
         self.answers = copy.deepcopy(DEFAULT_ANSWERS)
         self.cli_answers = cli_answers
@@ -70,6 +72,7 @@ class NuleculeManager(object):
         self.answers_file = None  # The path to an answer file
         self.app_path = None  # The path where the app resides or will reside
         self.image = None     # The container image to pull the app from
+        self.cli = cli
 
         # Adjust app_spec, destination, and answer file paths if absolute.
         if os.path.isabs(app_spec):
@@ -214,10 +217,12 @@ class NuleculeManager(object):
         if self.image:
             return Nulecule.unpack(
                 self.image, self.app_path, config=config,
-                nodeps=nodeps, dryrun=dryrun, update=update)
+                nodeps=nodeps, dryrun=dryrun, update=update,
+                cli=self.cli)
         else:
             return Nulecule.load_from_path(
-                self.app_path, dryrun=dryrun, config=config)
+                self.app_path, dryrun=dryrun, config=config,
+                cli=self.cli)
 
     def genanswers(self, dryrun=False, answers_format=None, **kwargs):
         """

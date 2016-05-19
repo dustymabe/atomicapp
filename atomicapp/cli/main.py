@@ -52,7 +52,7 @@ def print_app_location(app_path):
 def cli_genanswers(args):
     argdict = args.__dict__
     nm = NuleculeManager(app_spec=argdict['app_spec'],
-                         destination='none')
+                         destination='none', cli=argdict)
     nm.genanswers(**argdict)
     Utils.rm_dir(nm.app_path)  # clean up files
     sys.exit(0)
@@ -64,7 +64,8 @@ def cli_fetch(args):
     nm = NuleculeManager(app_spec=argdict['app_spec'],
                          destination=destination,
                          cli_answers=argdict['cli_answers'],
-                         answers_file=argdict['answers'])
+                         answers_file=argdict['answers'],
+                         cli=argdict)
     nm.fetch(**argdict)
     # Clean up the files if the user asked us to. Otherwise
     # notify the user where they can manage the application
@@ -81,7 +82,8 @@ def cli_run(args):
     nm = NuleculeManager(app_spec=argdict['app_spec'],
                          destination=destination,
                          cli_answers=argdict['cli_answers'],
-                         answers_file=argdict['answers'])
+                         answers_file=argdict['answers'],
+                         cli=argdict)
     nm.run(**argdict)
     # Clean up the files if the user asked us to. Otherwise
     # notify the user where they can manage the application
@@ -94,7 +96,8 @@ def cli_run(args):
 
 def cli_stop(args):
     argdict = args.__dict__
-    nm = NuleculeManager(app_spec=argdict['app_spec'])
+    nm = NuleculeManager(app_spec=argdict['app_spec'],
+                         cli=argdict)
     nm.stop(**argdict)
     sys.exit(0)
 
@@ -103,7 +106,8 @@ def cli_init(args):
     try:
         argdict = args.__dict__
         appdir = NuleculeManager.init(argdict['app_name'],
-                                      argdict['destination'])
+                                      argdict['destination'],
+                                      cli=argdict)
         if appdir:
             print('\nAtomic App: %s initialized at %s' %
                   (argdict['app_name'], appdir))
