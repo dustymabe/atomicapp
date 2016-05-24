@@ -92,8 +92,15 @@ class Config(object):
         """
         answers = defaultdict(dict)
         answers.update(copy.copy(self._answers))
+
         for key, value in self._data.items():
             answers[key].update(value)
+
+        # Remove empty sections for answers
+        for key, value in answers.items():
+            if value is None:
+                answers.pop(key, None)
+
         return answers
 
     def clone(self, namespace):
