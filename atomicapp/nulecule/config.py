@@ -13,6 +13,10 @@ cockpit_logger = logging.getLogger(LOGGER_COCKPIT)
 class Config(object):
     """
     Store config data for a Nulecule or Nulecule component.
+
+    It stores config data from different sources (answers, cli, user data)
+    separately, and exposes high level interfaces to read, write data
+    from it, with enforced read/write policies.
     """
 
     def __init__(self, namespace='', answers=None, cli=None,
@@ -20,9 +24,12 @@ class Config(object):
         self._namespace = namespace
         self._is_nulecule = is_nulecule or False
         self._parent_ns, self._current_ns = self._split_namespace(self._namespace)
+        # Store answers data
         self._answers = defaultdict(dict)
         self._answers.update(answers or {})
+        # Store CLI data
         self._cli = cli or {}
+        # Store data collected during runtime
         self._data = data or defaultdict(dict)
         self._context = None
         self._provider = None
@@ -61,9 +68,29 @@ class Config(object):
         return self._namespace or GLOBAL_CONF
 
     def set(self, key, value):
+        """
+        Set value for a key in the current namespace.
+
+        Args:
+            key (str): Key
+            value (str): Value.
+        """
         self._data[self.namespace][key] = value
 
     def get(self, key):
+        """
+        Get value for a key from data accessible from the current namespace.
+
+        TODO: Improved data inheritance model. It makes sense for a component
+        to be able to access data from it's sibling namespaces and children
+        namespaces.
+
+        Args:
+            key (str): Key
+
+        Returns:
+            Value for the key, else None.
+        """
         return (
             self._data[self.namespace].get(key) or
             (self._data[self._parent_ns].get(key) if self._parent_ns else None) or
@@ -76,6 +103,10 @@ class Config(object):
     def context(self):
         """
         Get context to render artifact files in a Nulecule component.
+
+        TODO: Improved data inheritance model. Data from siblings and children
+        namespaces should be available in the context to render an artifact
+        file in the current namespace.
         """
         if self._context is None:
             self._context = {}
@@ -89,6 +120,9 @@ class Config(object):
     def runtime_answers(self):
         """
         Get runtime answers.
+
+        Returns:
+            A defaultdict containing runtime answers data.
         """
         answers = defaultdict(dict)
         answers.update(copy.copy(self._answers))
