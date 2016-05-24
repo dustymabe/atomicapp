@@ -72,25 +72,6 @@ class NuleculeBase(object):
             config.set(param[NAME_KEY], value)
         self.config = config
 
-    def merge_config(self, to_config, from_config):
-        """
-        Merge values from from_config to to_config. If value for a key
-        in a group in to_config is missing, then only set it's value from
-        corresponding key in the same group in from_config.
-
-        Args:
-            to_config (dict): Dictionary to merge config into
-            from_config (dict): Dictionary to merge config from
-
-        Returns:
-            None
-        """
-        for group, group_vars in from_config.items():
-            to_config[group] = to_config.get(group) or {}
-            for key, value in (group_vars or {}).items():
-                if to_config[group].get(key) is None:
-                    to_config[group][key] = value
-
     def get_context(self):
         """
         Get context data from config data for rendering an artifact.
