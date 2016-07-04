@@ -44,7 +44,6 @@ from atomicapp.nulecule.lib import NuleculeBase
 from atomicapp.nulecule.container import DockerHandler
 from atomicapp.nulecule.exceptions import NuleculeException
 from atomicapp.providers.openshift import OpenshiftProvider
-from atomicapp.nulecule.config import Config
 
 from jsonpointer import resolve_pointer, set_pointer, JsonPointerException
 from anymarkup import AnyMarkupError
@@ -64,7 +63,7 @@ class Nulecule(NuleculeBase):
 
     def __init__(self, id, specversion, graph, basepath, metadata=None,
                  requirements=None, params=None, config=None,
-                 namespace=GLOBAL_CONF, cli=None):
+                 namespace=GLOBAL_CONF):
         """
         Create a Nulecule instance.
 
@@ -76,9 +75,8 @@ class Nulecule(NuleculeBase):
             metadata (dict): Nulecule metadata
             requirements (dict): Requirements for the Nulecule application
             params (list): List of params for the Nulecule application
-            config (dict): Config data for the Nulecule application
+            config (atomicapp.nulecule.config.Config): Config data
             namespace (str): Namespace of the current Nulecule application
-            cli (dict): CLI data
 
         Returns:
             A Nulecule instance
@@ -89,16 +87,11 @@ class Nulecule(NuleculeBase):
         self.metadata = metadata or {}
         self.graph = graph
         self.requirements = requirements
-        if isinstance(config, Config):
-            self.config = config
-        else:
-            self.config = Config(namespace=namespace, answers=config,
-                                 cli=cli)
+        self.config = config
 
     @classmethod
     def unpack(cls, image, dest, config=None, namespace=GLOBAL_CONF,
-               nodeps=False, dryrun=False, update=False,
-               cli=None):
+               nodeps=False, dryrun=False, update=False):
         """
         Pull and extracts a docker image to the specified path, and loads
         the Nulecule application from the path.
@@ -107,13 +100,12 @@ class Nulecule(NuleculeBase):
             image (str): A Docker image name.
             dest (str): Destination path where Nulecule data from Docker
                         image should be extracted.
-            config (dict): Dictionary, config data for Nulecule application.
+            config: An instance of atomicapp.nulecule.config.Config
             namespace (str): Namespace for Nulecule application.
             nodeps (bool): Don't pull external Nulecule dependencies when
                            True.
             update (bool): Don't update contents of destination directory
                            if False, else update it.
-            cli (dict): CLI data.
 
         Returns:
             A Nulecule instance, or None in case of dry run.
@@ -134,19 +126,19 @@ class Nulecule(NuleculeBase):
 
         return cls.load_from_path(
             dest, config=config, namespace=namespace, nodeps=nodeps,
-            dryrun=dryrun, update=update, cli=cli)
+            dryrun=dryrun, update=update)
 
     @classmethod
     def load_from_path(cls, src, config=None, namespace=GLOBAL_CONF,
-                       nodeps=False, dryrun=False, update=False,
-                       cli=None):
+                       nodeps=False, dryrun=False, update=False):
         """
         Load a Nulecule application from a path in the source path itself, or
         in the specified destination path.
 
         Args:
             src (str): Path to load Nulecule application from.
-            config (dict): Config data for Nulecule application.
+            config (atomicapp.nulecule.config.Config): Config data for
+                Nulecule application.
             namespace (str): Namespace for Nulecule application.
             nodeps (bool): Do not pull external applications if True.
             dryrun (bool): Do not make any change to underlying host.
@@ -184,8 +176,9 @@ class Nulecule(NuleculeBase):
             raise NuleculeException("Failure parsing %s file. Validation error on line %s, column %s:\n%s"
                                     % (nulecule_path, line, column, output))
 
-        nulecule = Nulecule(config=config, basepath=src,
-                            namespace=namespace, cli=cli, **nulecule_data)
+        nulecule = Nulecule(config=config,
+                            basepath=src, namespace=namespace,
+                            **nulecule_data)
         nulecule.load_components(nodeps, dryrun)
         return nulecule
 
@@ -239,8 +232,8 @@ class Nulecule(NuleculeBase):
         It updates self.config.
 
         Args:
-            config (dict): Existing config data, may be from ANSWERS
-                           file or any other source.
+            config (atomicapp.nulecule.config.Config): Existing config data,
+                may be from ANSWERS file or any other source.
 
         Returns:
             None
