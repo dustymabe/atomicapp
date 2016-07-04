@@ -122,7 +122,7 @@ class Nulecule(NuleculeBase):
         if Utils.running_on_openshift():
             # pass general config data containing provider specific data
             # to Openshift provider
-            op = OpenshiftProvider(config.get('general', {}), './', False)
+            op = OpenshiftProvider(config.globals, './', False)
             op.artifacts = []
             op.init()
             op.extract(image, APP_ENT_PATH, dest, update)

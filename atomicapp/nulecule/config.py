@@ -35,6 +35,16 @@ class Config(object):
         self._provider = None
 
     @property
+    def globals(self):
+        """
+        Get global config params dict for a Nulecule.
+        """
+        d = self._answers.get(GLOBAL_CONF, {})
+        d.update(self._data.get(GLOBAL_CONF, {}))
+        d.update(self._cli.get(GLOBAL_CONF, {}))
+        return d
+
+    @property
     def provider(self):
         """
         Get provider name.
