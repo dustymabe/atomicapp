@@ -4,6 +4,7 @@ import logging
 from atomicapp.constants import (GLOBAL_CONF,
                                  LOGGER_COCKPIT,
                                  DEFAULT_PROVIDER,
+                                 DEFAULT_ANSWERS,
                                  NAMESPACE_SEPARATOR)
 from collections import defaultdict
 
@@ -135,7 +136,11 @@ class Config(object):
             A defaultdict containing runtime answers data.
         """
         answers = defaultdict(dict)
-        answers.update(copy.copy(self._answers))
+        answers.update(copy.deepcopy(DEFAULT_ANSWERS))
+        answers['general']['provider'] = self.provider
+
+        for key, value in self._answers.items():
+            answers[key].update(value)
 
         for key, value in self._data.items():
             answers[key].update(value)
