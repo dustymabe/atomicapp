@@ -136,19 +136,18 @@ class TestNuleculeComponentLoadConfig(unittest.TestCase):
             'general': {'a': 'b', 'key2': 'val2'},
             'some-app': {'key1': 'val1'}
         }
-        config = Config('some-app', answers=initial_config)
+        conf = Config('some-app', answers=initial_config)
 
         nc = NuleculeComponent('some-app', 'some/path',
-                               params=params)
-        nc.load_config(config=config)
-
-        self.assertEqual(nc.config.runtime_answers(), {
-            'general': {'a': 'b', 'key2': 'val2'},
+                               params=params, config=conf)
+        nc.load_config()
+        runtime_answers = nc.config.runtime_answers()
+        self.assertEqual(runtime_answers, {
+            'general': {'a': 'b', 'key2': 'val2', 'provider': 'kubernetes', 'namespace': 'default'},
             'some-app': {'key1': 'val1', 'key2': 'val2'}
         })
 
-    @mock.patch('atomicapp.nulecule.base.NuleculeComponent.merge_config')
-    def test_load_config_external_app(self, mock_merge_config):
+    def test_load_config_external_app(self):
         """Test load config for external app"""
         mock_nulecule = mock.Mock(
             name='nulecule',
