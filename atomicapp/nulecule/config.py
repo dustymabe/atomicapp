@@ -54,7 +54,8 @@ class Config(object):
             Provider name (str)
         """
         if self._provider is None:
-            self._provider = self._answers[GLOBAL_CONF].get('provider')
+            self._provider = self._data[GLOBAL_CONF].get('provider') or \
+                self._answers[GLOBAL_CONF].get('provider')
             if self._provider is None:
                 self._data[GLOBAL_CONF]['provider'] = DEFAULT_PROVIDER
                 self._provider = DEFAULT_PROVIDER
