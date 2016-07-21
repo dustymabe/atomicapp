@@ -27,8 +27,7 @@ import urlparse
 import urllib
 from string import Template
 
-from atomicapp.constants import (GLOBAL_CONF,
-                                 ANSWERS_FILE_SAMPLE_FORMAT,
+from atomicapp.constants import (ANSWERS_FILE_SAMPLE_FORMAT,
                                  ANSWERS_FILE,
                                  ANSWERS_FILE_SAMPLE,
                                  ANSWERS_RUNTIME_FILE,
@@ -241,7 +240,7 @@ class NuleculeManager(object):
         if os.path.exists(answers_file):
             raise NuleculeException(
                 "Can't generate answers.conf over existing file")
-        self.config = Config(namespace=GLOBAL_CONF)
+        self.config = Config()
 
         # Call unpack to get the app code
         self.nulecule = self.unpack(update=False, dryrun=dryrun, config=self.config)
@@ -400,8 +399,7 @@ class NuleculeManager(object):
             # Load answers
             self.answers = Utils.loadAnswers(self.answers_file)
 
-        self.config = Config(namespace=GLOBAL_CONF, answers=self.answers,
-                             cli={GLOBAL_CONF: self.cli_answers})
+        self.config = Config(answers=self.answers, cli=self.cli_answers)
 
         # If there is answers data from the cli then merge it in now
         # if self.cli_answers:
@@ -423,6 +421,7 @@ class NuleculeManager(object):
         logger.debug("Writing answers to file.")
         logger.debug("FILE: %s", path)
         logger.debug("ANSWERS: %s", answers)
+        from ipdb import set_trace; set_trace()
         anymarkup.serialize_file(answers, path, format=answers_format)
 
         # Make sure that the permission of the file is set to the current user

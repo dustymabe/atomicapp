@@ -12,6 +12,71 @@ cockpit_logger = logging.getLogger(LOGGER_COCKPIT)
 
 
 class Config(object):
+
+    PRIORITY = (
+        'cli',
+        'runtime',
+        'answers',
+        'defaults'
+    )
+
+    def __init__(self, answers=None, cli=None):
+        answers = answers or {}
+        cli = cli or {}
+        self._data = defaultdict(defaultdict)
+        self._data['defaults'] = defaultdict(defaultdict)
+        self._data['answers'] = defaultdict(defaultdict)
+        self._data['cli'] = defaultdict(defaultdict)
+        self._data['runtime'] = defaultdict(defaultdict)
+
+        for scope, data in answers.items():
+            for key, value in data.items():
+                self.set(key, value, scope=scope, source='answers')
+
+        for key, value in cli.items():
+            self.set(key, value, scope=GLOBAL_CONF, source='cli')
+
+    def get(self, key, scope=GLOBAL_CONF):
+        value = None
+        for source in self.PRIORITY:
+            value = self._data[source][scope].get(key)
+            if value:
+                break
+        return value
+
+    def set(self, key, value, scope=GLOBAL_CONF, source='defaults'):
+        self._data[source][scope][key] = value
+
+    def context(self, scope=GLOBAL_CONF):
+        result = {}
+        for source in reversed(self.PRIORITY):
+            data = self._data[source]
+            result.update(copy.deepcopy(data.get(GLOBAL_CONF) or {}))
+            result.update(copy.deepcopy(data.get(scope) or {}))
+        return result
+
+    def runtime_answers(self):
+        """
+        Get runtime answers.
+
+        Returns:
+            A defaultdict containing runtime answers data.
+        """
+        answers = defaultdict(dict)
+
+        for source in reversed(self.PRIORITY):
+            for scope, data in (self._data.get(source) or {}).items():
+                answers[scope].update(copy.deepcopy(data))
+
+        # Remove empty sections for answers
+        for key, value in answers.items():
+            if value is None:
+                answers.pop(key, None)
+
+        return answers
+
+
+class _Config(object):
     """
     Store config data for a Nulecule or Nulecule component.
 

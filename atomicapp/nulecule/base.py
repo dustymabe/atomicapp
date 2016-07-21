@@ -247,7 +247,7 @@ class Nulecule(NuleculeBase):
             # FIXME: Find a better way to expose config data to components.
             #        A component should not get access to all the variables,
             #        but only to variables it needs.
-            component.load_config(config=config.clone(component.namespace),
+            component.load_config(config=config,
                                   ask=ask, skip_asking=skip_asking)
 
     def load_components(self, nodeps=False, dryrun=False):
@@ -366,7 +366,7 @@ class NuleculeComponent(NuleculeBase):
         super(NuleculeComponent, self).load_config(
             config, ask=ask, skip_asking=skip_asking)
         if isinstance(self._app, Nulecule):
-            self._app.load_config(config=self.config.clone(self.namespace),
+            self._app.load_config(config=self.config,
                                   ask=ask, skip_asking=skip_asking)
 
     def load_external_application(self, dryrun=False, update=False):

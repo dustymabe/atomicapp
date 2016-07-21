@@ -19,7 +19,8 @@
 """
 import logging
 
-from atomicapp.constants import (LOGGER_COCKPIT,
+from atomicapp.constants import (GLOBAL_CONF,
+                                 LOGGER_COCKPIT,
                                  NAME_KEY,
                                  DEFAULTNAME_KEY,
                                  PROVIDERS)
@@ -62,14 +63,14 @@ class NuleculeBase(object):
             None
         """
         for param in self.params:
-            value = config.get(param[NAME_KEY])
+            value = config.get(param[NAME_KEY], scope=self.namespace)
             if value is None and (ask or (
                     not skip_asking and param.get(DEFAULTNAME_KEY) is None)):
                 cockpit_logger.info("%s is missing in answers.conf." % param[NAME_KEY])
                 value = Utils.askFor(param[NAME_KEY], param, self.namespace)
             elif value is None:
                 value = param.get(DEFAULTNAME_KEY)
-            config.set(param[NAME_KEY], value)
+            config.set(param[NAME_KEY], value, scope=self.namespace, source='runtime')
         self.config = config
 
     def get_context(self):
@@ -91,7 +92,7 @@ class NuleculeBase(object):
         """
         # If provider_key isn't provided via CLI, let's grab it the configuration
         if provider_key is None:
-            provider_key = self.config.provider
+            provider_key = self.config.get('provider', scope=GLOBAL_CONF)
         provider_class = self.plugin.getProvider(provider_key)
         if provider_class is None:
             raise NuleculeException("Invalid Provider - '{}', provided in "
