@@ -63,7 +63,6 @@ class NuleculeManager(object):
             destination: where to unpack a nulecule to if it isn't local
             cli_answers: some answer file values provided from cli args
             answers_file: the location of the answers file
-            cli (dict): CLI data
         """
         self.answers = copy.deepcopy(DEFAULT_ANSWERS)
         self.cli_answers = cli_answers
@@ -249,7 +248,7 @@ class NuleculeManager(object):
         # Get answers and write them out to answers.conf in cwd
         answers = self._get_runtime_answers(
             self.nulecule.config, None)
-        self._write_answers(answers_file, answers, answers_format)
+        self._write_answers(answers_file, answers, self.answers_format)
 
     def fetch(self, nodeps=False, update=False, dryrun=False,
               answers_format=ANSWERS_FILE_SAMPLE_FORMAT, **kwargs):
@@ -284,16 +283,14 @@ class NuleculeManager(object):
 
         cockpit_logger.info("Install Successful.")
 
-    def run(self, cli_provider, answers_output, ask,
-            answers_format=ANSWERS_FILE_SAMPLE_FORMAT, **kwargs):
+    def run(self, answers_output, ask, answers_format=ANSWERS_FILE_SAMPLE_FORMAT,
+            **kwargs):
         """
         Runs a Nulecule application from a local path or a Nulecule image
         name.
 
         Args:
             answers (dict or str): Answers data or local path to answers file
-            cli_provider (str): Provider to use to run the Nulecule
-                                application
             answers_output (str): Path to file to export runtime answers data
                                   to
             ask (bool): Ask for values for params with default values from
@@ -317,12 +314,11 @@ class NuleculeManager(object):
         self.nulecule = self.unpack(dryrun=dryrun, config=self.config)
 
         self.nulecule.load_config(ask=ask)
-        if cli_provider:
-            self.nulecule.config.set('provider', cli_provider)
-        self.nulecule.render(cli_provider, dryrun)
-        self.nulecule.run(cli_provider, dryrun)
+        provider = self.nulecule.config.get('provider')
+        self.nulecule.render(provider, dryrun)
+        self.nulecule.run(provider, dryrun)
         runtime_answers = self._get_runtime_answers(
-            self.nulecule.config, cli_provider)
+            self.nulecule.config, provider)
         self._write_answers(
             os.path.join(self.app_path, ANSWERS_RUNTIME_FILE),
             runtime_answers, self.answers_format)
@@ -330,12 +326,11 @@ class NuleculeManager(object):
             self._write_answers(answers_output, runtime_answers,
                                 self.answers_format)
 
-    def stop(self, cli_provider, **kwargs):
+    def stop(self, **kwargs):
         """
         Stops a running Nulecule application.
 
         Args:
-            cli_provider (str): Provider running the Nulecule application
             kwargs (dict): Extra keyword arguments
         """
         # For stop we use the generated answer file from the run
@@ -346,10 +341,9 @@ class NuleculeManager(object):
         self.nulecule = Nulecule.load_from_path(
             self.app_path, config=self.config, dryrun=dryrun)
         self.nulecule.load_config()
-        if cli_provider:
-            self.nulecule.config.set('provider', cli_provider)
-        self.nulecule.render(self.nulecule.config.provider, dryrun=dryrun)
-        self.nulecule.stop(self.nulecule.config.provider, dryrun)
+        self.nulecule.render(self.nulecule.config.get('provider'),
+                             dryrun=dryrun)
+        self.nulecule.stop(self.nulecule.config.get('provider'), dryrun)
 
     def clean(self, force=False):
         # For future use
@@ -421,7 +415,6 @@ class NuleculeManager(object):
         logger.debug("Writing answers to file.")
         logger.debug("FILE: %s", path)
         logger.debug("ANSWERS: %s", answers)
-        from ipdb import set_trace; set_trace()
         anymarkup.serialize_file(answers, path, format=answers_format)
 
         # Make sure that the permission of the file is set to the current user

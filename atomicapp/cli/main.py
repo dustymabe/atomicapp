@@ -306,7 +306,7 @@ class CLI():
             help="A file which will contain anwsers provided in interactive mode")
         run_subparser.add_argument(
             "--provider",
-            dest="cli_provider",
+            dest="provider",
             choices=PROVIDERS,
             help="The provider to use. Overrides provider value in answerfile.")
         run_subparser.add_argument(
@@ -511,7 +511,8 @@ class CLI():
         # and make a dictionary of it to pass along in args.
         setattr(args, 'cli_answers', {})
         for item in ['provider-api', 'provider-cafile', 'provider-auth',
-                     'provider-config', 'provider-tlsverify', 'namespace']:
+                     'provider-config', 'provider-tlsverify', 'namespace',
+                     'provider']:
             if hasattr(args, item) and getattr(args, item) is not None:
                 args.cli_answers[item] = getattr(args, item)
 

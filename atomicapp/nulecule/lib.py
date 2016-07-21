@@ -62,22 +62,19 @@ class NuleculeBase(object):
         Returns:
             None
         """
+        self.config = config
         for param in self.params:
             value = config.get(param[NAME_KEY], scope=self.namespace)
-            if value is None and (ask or (
-                    not skip_asking and param.get(DEFAULTNAME_KEY) is None)):
-                cockpit_logger.info("%s is missing in answers.conf." % param[NAME_KEY])
-                value = Utils.askFor(param[NAME_KEY], param, self.namespace)
-            elif value is None:
-                value = param.get(DEFAULTNAME_KEY)
-            config.set(param[NAME_KEY], value, scope=self.namespace, source='runtime')
-        self.config = config
-
-    def get_context(self):
-        """
-        Get context data from config data for rendering an artifact.
-        """
-        return self.config.context()
+            if value is None:
+                if ask or (not skip_asking and
+                           param.get(DEFAULTNAME_KEY) is None):
+                    cockpit_logger.info(
+                        "%s is missing in answers.conf." % param[NAME_KEY])
+                    value = Utils.askFor(param[NAME_KEY], param)
+                else:
+                    value = param.get(DEFAULTNAME_KEY)
+                config.set(param[NAME_KEY], value, source='runtime',
+                           scope=self.namespace)
 
     def get_provider(self, provider_key=None, dry=False):
         """
