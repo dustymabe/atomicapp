@@ -64,7 +64,8 @@ def cli_fetch(args):
     nm = NuleculeManager(app_spec=argdict['app_spec'],
                          destination=destination,
                          cli_answers=argdict['cli_answers'],
-                         answers_file=argdict['answers'])
+                         answers_file=argdict['answers'],
+                         answers_format=argdict.get('answers_format'))
     nm.fetch(**argdict)
     # Clean up the files if the user asked us to. Otherwise
     # notify the user where they can manage the application
@@ -81,7 +82,8 @@ def cli_run(args):
     nm = NuleculeManager(app_spec=argdict['app_spec'],
                          destination=destination,
                          cli_answers=argdict['cli_answers'],
-                         answers_file=argdict['answers'])
+                         answers_file=argdict['answers'],
+                         answers_format=argdict.get('answers_format'))
     nm.run(**argdict)
     # Clean up the files if the user asked us to. Otherwise
     # notify the user where they can manage the application

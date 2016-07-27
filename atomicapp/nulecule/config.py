@@ -94,6 +94,7 @@ class Config(object):
             value = self._data[source][scope].get(key)
             if value:
                 return value
+        return None
 
     def set(self, key, value, source, scope=GLOBAL_CONF):
         """

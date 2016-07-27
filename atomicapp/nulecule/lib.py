@@ -97,7 +97,7 @@ class NuleculeBase(object):
                                     .format(provider_key, ', '
                                                           .join(PROVIDERS)))
         return provider_key, provider_class(
-            self.get_context(), self.basepath, dry)
+            self.config.context(), self.basepath, dry)
 
     def run(self, provider_key=None, dry=False):
         raise NotImplementedError

@@ -53,7 +53,8 @@ class NuleculeManager(object):
     """
 
     def __init__(self, app_spec, destination=None,
-                 cli_answers=None, answers_file=None):
+                 cli_answers=None, answers_file=None,
+                 answers_format=ANSWERS_FILE_SAMPLE_FORMAT):
         """
         init function for NuleculeManager. Sets a few instance variables.
 
@@ -63,10 +64,9 @@ class NuleculeManager(object):
             destination: where to unpack a nulecule to if it isn't local
             cli_answers: some answer file values provided from cli args
             answers_file: the location of the answers file
+            answers_format (str): File format for writing sample answers file
         """
-        self.answers = copy.deepcopy(DEFAULT_ANSWERS)
-        self.cli_answers = cli_answers
-        self.answers_format = None
+        self.answers_format = answers_format or ANSWERS_FILE_SAMPLE_FORMAT
         self.answers_file = None  # The path to an answer file
         self.app_path = None  # The path where the app resides or will reside
         self.image = None     # The container image to pull the app from
@@ -117,7 +117,7 @@ class NuleculeManager(object):
 
         # Process answers.
         self.answers_file = answers_file
-        self._process_answers()
+        self.config = self._process_answers(cli_answers)
 
     @staticmethod
     def init(app_name, destination=None, app_version='1.0',
@@ -219,20 +219,18 @@ class NuleculeManager(object):
             return Nulecule.load_from_path(
                 self.app_path, dryrun=dryrun, config=config)
 
-    def genanswers(self, dryrun=False, answers_format=None, **kwargs):
+    def genanswers(self, dryrun=False, **kwargs):
         """
         Renders artifacts and then generates an answer file. Finally
         copies answer file to the current working directory.
 
         Args:
             dryrun (bool): Do not make any change to the host system if True
-            answers_format (str): File format for writing sample answers file
             kwargs (dict): Extra keyword arguments
 
         Returns:
             None
         """
-        self.answers_format = answers_format or ANSWERS_FILE_SAMPLE_FORMAT
 
         # Check to make sure an answers.conf file doesn't exist already
         answers_file = os.path.join(os.getcwd(), ANSWERS_FILE)
@@ -250,8 +248,7 @@ class NuleculeManager(object):
             self.nulecule.config, None)
         self._write_answers(answers_file, answers, self.answers_format)
 
-    def fetch(self, nodeps=False, update=False, dryrun=False,
-              answers_format=ANSWERS_FILE_SAMPLE_FORMAT, **kwargs):
+    def fetch(self, nodeps=False, update=False, dryrun=False, **kwargs):
         """
         Installs (unpacks) a Nulecule application from a Nulecule image
         to a target path.
@@ -262,13 +259,10 @@ class NuleculeManager(object):
             update (bool): Pull requisite Nulecule image and install or
                            update already installed Nulecule application
             dryrun (bool): Do not make any change to the host system if True
-            answers_format (str): File format for writing sample answers file
             kwargs (dict): Extra keyword arguments
         Returns:
             None
         """
-        self.answers_format = answers_format or ANSWERS_FILE_SAMPLE_FORMAT
-
         # Call unpack. If the app doesn't exist it will be pulled. If
         # it does exist it will be just be loaded and returned
         self.nulecule = self.unpack(update, dryrun, config=self.config)
@@ -279,12 +273,11 @@ class NuleculeManager(object):
         # write sample answers file
         self._write_answers(
             os.path.join(self.app_path, ANSWERS_FILE_SAMPLE),
-            runtime_answers, answers_format)
+            runtime_answers, self.answers_format)
 
         cockpit_logger.info("Install Successful.")
 
-    def run(self, answers_output, ask, answers_format=ANSWERS_FILE_SAMPLE_FORMAT,
-            **kwargs):
+    def run(self, answers_output, ask, **kwargs):
         """
         Runs a Nulecule application from a local path or a Nulecule image
         name.
@@ -295,19 +288,12 @@ class NuleculeManager(object):
                                   to
             ask (bool): Ask for values for params with default values from
                         user, if True
-            answers_format (str): File format for writing sample answers file
             kwargs (dict): Extra keyword arguments
 
         Returns:
             None
         """
-        self.answers_format = answers_format or ANSWERS_FILE_SAMPLE_FORMAT
         dryrun = kwargs.get('dryrun') or False
-
-        # If we didn't find an answers file before then call _process_answers
-        # again just in case the app developer embedded an answers file
-        if not self.answers_file:
-            self._process_answers()
 
         # Call unpack. If the app doesn't exist it will be pulled. If
         # it does exist it will be just be loaded and returned
@@ -335,7 +321,7 @@ class NuleculeManager(object):
         """
         # For stop we use the generated answer file from the run
         self.answers_file = os.path.join(self.app_path, ANSWERS_RUNTIME_FILE)
-        self._process_answers()
+        self.config = self._process_answers()
 
         dryrun = kwargs.get('dryrun') or False
         self.nulecule = Nulecule.load_from_path(
@@ -351,7 +337,7 @@ class NuleculeManager(object):
         distutils.dir_util.remove_tree(self.unpack_path)
         self.initialize()
 
-    def _process_answers(self):
+    def _process_answers(self, cli_answers=None):
         """
         Processes answer files to load data from them and then merges
         any cli provided answers into the config.
@@ -365,6 +351,7 @@ class NuleculeManager(object):
         Returns:
             None
         """
+        answers = None
         app_path_answers = os.path.join(self.app_path, ANSWERS_FILE)
 
         # If the user didn't provide an answers file then check the app
@@ -391,14 +378,9 @@ class NuleculeManager(object):
                     "Provided answers file doesn't exist: {}".format(self.answers_file))
 
             # Load answers
-            self.answers = Utils.loadAnswers(self.answers_file)
+            answers = Utils.loadAnswers(self.answers_file)
 
-        self.config = Config(answers=self.answers, cli=self.cli_answers)
-
-        # If there is answers data from the cli then merge it in now
-        # if self.cli_answers:
-        #    for k, v in self.cli_answers.iteritems():
-        #        self.answers[GLOBAL_CONF][k] = v
+        return Config(answers=answers, cli=cli_answers)
 
     def _write_answers(self, path, answers, answers_format):
         """
