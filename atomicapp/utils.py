@@ -360,13 +360,17 @@ class Utils(object):
         return data
 
     @staticmethod
-    def loadAnswers(answers_file):
+    def loadAnswers(answers_file, format=None):
         if not os.path.isfile(answers_file):
             raise AtomicAppUtilsException(
                 "Provided answers file does not exist: %s" % answers_file)
 
         logger.debug("Loading answers from file: %s", answers_file)
-        return anymarkup.parse_file(answers_file)
+        try:
+            result = anymarkup.parse_file(answers_file, format=format)
+        except anymarkup.AnyMarkupError:
+            result = anymarkup.parse_file(answers_file)
+        return result
 
     @staticmethod
     def copy_dir(src, dest, update=False, dryrun=False):

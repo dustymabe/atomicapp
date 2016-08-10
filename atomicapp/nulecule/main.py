@@ -18,7 +18,6 @@
  along with Atomic App. If not, see <http://www.gnu.org/licenses/>.
 """
 import anymarkup
-import copy
 import distutils.dir_util
 import logging
 import os
@@ -31,7 +30,6 @@ from atomicapp.constants import (ANSWERS_FILE_SAMPLE_FORMAT,
                                  ANSWERS_FILE,
                                  ANSWERS_FILE_SAMPLE,
                                  ANSWERS_RUNTIME_FILE,
-                                 DEFAULT_ANSWERS,
                                  LOGGER_COCKPIT,
                                  LOGGER_DEFAULT,
                                  MAIN_FILE,
@@ -378,7 +376,7 @@ class NuleculeManager(object):
                     "Provided answers file doesn't exist: {}".format(self.answers_file))
 
             # Load answers
-            answers = Utils.loadAnswers(self.answers_file)
+            answers = Utils.loadAnswers(self.answers_file, self.answers_format)
 
         return Config(answers=answers, cli=cli_answers)
 
