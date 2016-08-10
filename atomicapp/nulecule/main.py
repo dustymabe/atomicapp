@@ -115,7 +115,7 @@ class NuleculeManager(object):
 
         # Process answers.
         self.answers_file = answers_file
-        self.config = self._process_answers(cli_answers)
+        self.config=Config(cli=cli_answers)
 
     @staticmethod
     def init(app_name, destination=None, app_version='1.0',
@@ -235,7 +235,6 @@ class NuleculeManager(object):
         if os.path.exists(answers_file):
             raise NuleculeException(
                 "Can't generate answers.conf over existing file")
-        self.config = Config()
 
         # Call unpack to get the app code
         self.nulecule = self.unpack(update=False, dryrun=dryrun, config=self.config)
@@ -297,6 +296,9 @@ class NuleculeManager(object):
         # it does exist it will be just be loaded and returned
         self.nulecule = self.unpack(dryrun=dryrun, config=self.config)
 
+        # process the answers file
+        self.config = self._process_answers()
+
         self.nulecule.load_config(ask=ask)
         provider = self.nulecule.config.get('provider')
         self.nulecule.render(provider, dryrun)
@@ -335,7 +337,7 @@ class NuleculeManager(object):
         distutils.dir_util.remove_tree(self.unpack_path)
         self.initialize()
 
-    def _process_answers(self, cli_answers=None):
+    def _process_answers(self):
         """
         Processes answer files to load data from them and then merges
         any cli provided answers into the config.
@@ -378,7 +380,7 @@ class NuleculeManager(object):
             # Load answers
             answers = Utils.loadAnswers(self.answers_file, self.answers_format)
 
-        return Config(answers=answers, cli=cli_answers)
+        return self.config.update_source(source='answers', data=answers)
 
     def _write_answers(self, path, answers, answers_format):
         """
