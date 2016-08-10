@@ -77,7 +77,7 @@ class Config(object):
         for key, value in cli.items():
             self.set(key, value, scope=GLOBAL_CONF, source='cli')
 
-    def get(self, key, scope=GLOBAL_CONF):
+    def get(self, key, scope=GLOBAL_CONF, ignore_sources=[]):
         """
         Get the value of a key in a scope. This takes care of resolving
         the value by going through the PRIORITY order of the various
@@ -91,7 +91,10 @@ class Config(object):
             Value for the key.
         """
         for source in self.PRIORITY:
-            value = self._data[source][scope].get(key)
+            if source in ignore_sources:
+                continue
+            value = self._data[source][scope].get(key) or self._data[source][
+                GLOBAL_CONF].get(key)
             if value:
                 return value
         return None
